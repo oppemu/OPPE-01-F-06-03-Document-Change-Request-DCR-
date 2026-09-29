@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <div class="header-logo">
-            <img src="logo.png" alt="Logo" onerror="this.style.display='none'">
+            <img src="LOGO.png" alt="Logo" onerror="this.style.display='none'">
             <h2>ใบร้องขอแก้ไขเอกสาร (Document Change Request : DCR)</h2>
         </div>
 
@@ -19,9 +19,9 @@
                 <h3>1. ข้อมูลผู้ร้องขอแก้ไข</h3>
                 <div class="form-group">
                     <label for="email">EMAIL:</label>
-                    <div style="display: flex; gap: 8px;">
-                        <input type="email" id="email" placeholder="กรอกอีเมลเพื่อค้นหา" style="flex: 1;" required>
-                        <button type="button" id="btnCheckEmail" onclick="handleCheckEmail()">ตรวจสอบ</button>
+                    <div class="search-box">
+                        <input type="email" id="email" placeholder="กรอกอีเมลเพื่อค้นหา" required>
+                        <button type="button" id="btnCheckEmail" class="btn-search" onclick="handleCheckEmail()">ตรวจสอบ</button>
                     </div>
                 </div>
                 <div class="form-group">
@@ -114,7 +114,6 @@
         </form>
     </div>
 
-    <!-- เรียกใช้ config.js ก่อน script.js เพื่อป้องกันข้อผิดพลาด -->
     <script src="config.js"></script>
     <script src="script.js"></script>
 </body>
