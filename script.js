@@ -1,15 +1,12 @@
 let categoriesData = {};
 
-// กำหนดวันที่ปัจจุบันในช่อง วันที่ดำเนินการ
 document.addEventListener("DOMContentLoaded", function () {
     const today = new Date().toISOString().split("T")[0];
     document.getElementById("entryDate").value = today;
-    
-    // โหลดหมวดหมู่งานทันทีที่เปิดหน้าเว็บ
     loadCategories();
 });
 
-// ดึงหมวดหมู่งานจาก Google Apps Script (JSONP)
+// โหลดหมวดหมู่งาน (JSONP)
 function loadCategories() {
     const script = document.createElement("script");
     script.src = `${CONFIG.GOOGLE_SCRIPT_URL}?action=getCategories&callback=renderCategories`;
@@ -33,7 +30,7 @@ function renderCategories(response) {
     }
 }
 
-// เมื่อเปลี่ยนหมวดงาน ให้เปลี่ยนรายการระเบียบปฏิบัติ (P/WI)
+// เลือกหมวดงานเพื่อโหลดชื่อระเบียบปฏิบัติ
 function handleCategoryChange() {
     const selectedCat = document.getElementById("categoryInput").value;
     const pwiSelect = document.getElementById("pwiInput");
@@ -62,7 +59,7 @@ function handleCheckEmail() {
 
     const btn = document.getElementById("btnCheckEmail");
     btn.disabled = true;
-    btn.textContent = "กำลังตรวจสอบ...";
+    btn.textContent = "ตรวจสอบ...";
 
     const script = document.createElement("script");
     script.src = `${CONFIG.GOOGLE_SCRIPT_URL}?action=checkEmail&email=${encodeURIComponent(email)}&callback=renderUserData`;
@@ -77,31 +74,15 @@ function renderUserData(response) {
     if (response.isValid && response.data) {
         document.getElementById("reporterName").value = response.data.name || "";
         document.getElementById("position").value = response.data.position || "";
-        document.getElementById("department").value = response.data.department || "";
+        document.getElementById("deptCode").value = response.data.deptCode || response.data.department || "";
         alert("พบข้อมูลผู้ใช้เรียบร้อยแล้ว");
     } else {
         alert(response.message || "ไม่พบข้อมูลอีเมลนี้ในระบบ");
     }
 }
 
-// ตรวจสอบจำนวนครั้งที่เคยดำเนินการเรื่องนี้ (JSONP)
-function handleSubjectChange() {
-    const subject = document.getElementById("subject").value.trim();
-    if (!subject) return;
-
-    const script = document.createElement("script");
-    script.src = `${CONFIG.GOOGLE_SCRIPT_URL}?action=getVisitCount&subject=${encodeURIComponent(subject)}&callback=renderVisitCount`;
-    document.body.appendChild(script);
-}
-
-function renderVisitCount(response) {
-    if (response.status === "success") {
-        document.getElementById("currentVisit").value = response.count || 0;
-    }
-}
-
-// บันทึกแบบฟอร์ม (POST Request)
-document.getElementById("oppeForm").addEventListener("submit", async function (e) {
+// ส่งแบบฟอร์ม (POST Request)
+document.getElementById("dcrForm").addEventListener("submit", async function (e) {
     e.preventDefault();
 
     const btnSubmit = document.getElementById("btnSubmit");
@@ -126,14 +107,17 @@ document.getElementById("oppeForm").addEventListener("submit", async function (e
         email: document.getElementById("email").value.trim(),
         reporterName: document.getElementById("reporterName").value.trim(),
         position: document.getElementById("position").value.trim(),
-        department: document.getElementById("department").value.trim(),
+        deptCode: document.getElementById("deptCode").value.trim(),
         entryDate: document.getElementById("entryDate").value,
-        operationsName: document.getElementById("operationsName").value.trim(),
+        operationsName: document.getElementById("operationsName").value,
         categoryInput: document.getElementById("categoryInput").value,
         pwiInput: document.getElementById("pwiInput").value,
-        subject: document.getElementById("subject").value.trim(),
-        currentVisit: document.getElementById("currentVisit").value,
-        jobDetailInput: document.getElementById("jobDetailInput").value.trim(),
+        docType: document.getElementById("docType").value,
+        docCode: document.getElementById("docCode").value.trim(),
+        docName: document.getElementById("docName").value.trim(),
+        oldRev: document.getElementById("oldRev").value.trim(),
+        newRev: document.getElementById("newRev").value.trim(),
+        changeDetail: document.getElementById("changeDetail").value.trim(),
         attachFile: attachFileData
     };
 
@@ -145,8 +129,8 @@ document.getElementById("oppeForm").addEventListener("submit", async function (e
         const result = await res.json();
 
         if (result.success) {
-            alert(`บันทึกเรียบร้อยแล้ว! รหัส DCR: ${result.dcrId}`);
-            document.getElementById("oppeForm").reset();
+            alert(`บันทึกเรียบร้อยแล้ว! รหัสลำดับ: ${result.dcrId}`);
+            document.getElementById("dcrForm").reset();
             document.getElementById("pwiInput").disabled = true;
         } else {
             alert("เกิดข้อผิดพลาด: " + result.message);
@@ -156,7 +140,7 @@ document.getElementById("oppeForm").addEventListener("submit", async function (e
         console.error(err);
     } finally {
         btnSubmit.disabled = false;
-        btnSubmit.textContent = "บันทึกข้อมูล";
+        btnSubmit.textContent = "บันทึกข้อมูล DCR";
     }
 });
 
