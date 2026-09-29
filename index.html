@@ -3,78 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบบันทึก DCR / OPPE</title>
+    <title>ใบร้องขอแก้ไขเอกสาร (DCR)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <!-- โลโก้และหัวข้อ -->
         <div class="header">
             <img src="LOGO.png" alt="Logo" class="logo" onerror="this.style.display='none'">
-            <h2>แบบฟอร์มบันทึก DCR / OPPE</h2>
+            <h2>ใบร้องขอแก้ไขเอกสาร (Document Change Request : DCR)</h2>
         </div>
 
-        <form id="oppeForm">
-            <!-- 1. ค้นหาผู้ใช้งานด้วยอีเมล -->
+        <form id="dcrForm">
+            <!-- 1. ข้อมูลผู้ร้องขอ -->
             <div class="card">
-                <h3>1. ข้อมูลผู้บันทึก</h3>
+                <h3>1. ข้อมูลผู้ร้องขอแก้ไข</h3>
                 <div class="form-group">
-                    <label for="email">อีเมล (E-mail):</label>
+                    <label for="email">EMAIL:</label>
                     <div class="input-inline">
-                        <input type="email" id="email" required placeholder="example@domain.com">
+                        <input type="email" id="email" required placeholder="เช่น thiraphong.hem@mahidol.ac.th">
                         <button type="button" id="btnCheckEmail" onclick="handleCheckEmail()">ตรวจสอบ</button>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="reporterName">ชื่อ-นามสกุล:</label>
-                    <input type="text" id="reporterName" readonly placeholder="จะแสดงอัตโนมัติเมื่อพบอีเมล">
+                    <label for="reporterName">ชื่อ-นามสกุล (ผู้ขอแก้ไข):</label>
+                    <input type="text" id="reporterName" readonly placeholder="ระบบดึงให้อัตโนมัติ">
                 </div>
-                <div class="form-group">
-                    <label for="position">ตำแหน่ง:</label>
-                    <input type="text" id="position" readonly placeholder="จะแสดงอัตโนมัติ">
-                </div>
-                <div class="form-group">
-                    <label for="department">งาน/หน่วยงาน:</label>
-                    <input type="text" id="department" readonly placeholder="จะแสดงอัตโนมัติ">
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="position">ตำแหน่ง:</label>
+                        <input type="text" id="position" readonly placeholder="ระบบดึงให้อัตโนมัติ">
+                    </div>
+                    <div class="form-group col">
+                        <label for="deptCode">รหัสหน่วยงาน:</label>
+                        <input type="text" id="deptCode" readonly placeholder="ระบบดึงให้อัตโนมัติ">
+                    </div>
                 </div>
             </div>
 
-            <!-- 2. ข้อมูลการดำเนินการ -->
+            <!-- 2. ประเภทการดำเนินการและหมวดงาน -->
             <div class="card">
-                <h3>2. ข้อมูลการดำเนินการ / เอกสาร</h3>
+                <h3>2. การดำเนินการและหมวดหมู่ออกเอกสาร</h3>
                 <div class="form-group">
                     <label for="entryDate">วันที่ดำเนินการ:</label>
                     <input type="date" id="entryDate" required>
                 </div>
                 <div class="form-group">
-                    <label for="operationsName">ประเภท/สถานที่ดำเนินการ:</label>
-                    <input type="text" id="operationsName" placeholder="ระบุประเภทหรือสถานที่" required>
+                    <label for="operationsName">ประเภทการดำเนินการ:</label>
+                    <select id="operationsName" required>
+                        <option value="">-- เลือกประเภทการดำเนินการ --</option>
+                        <option value="แก้ไข">แก้ไข</option>
+                        <option value="ขึ้นทะเบียนใหม่">ขึ้นทะเบียนใหม่</option>
+                        <option value="ยกเลิกเอกสาร">ยกเลิกเอกสาร</option>
+                        <option value="ทบทวนเอกสาร">ทบทวนเอกสาร</option>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label for="categoryInput">หมวดงาน:</label>
+                    <label for="categoryInput">ลำดับหมวด/ชื่อหมวดงาน:</label>
                     <select id="categoryInput" onchange="handleCategoryChange()" required>
                         <option value="">-- กำลังโหลดหมวดงาน... --</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="pwiInput">ชื่อระเบียบปฏิบัติ (P/WI):</label>
+                    <label for="pwiInput">ชื่อระเบียบปฏิบัติ:</label>
                     <select id="pwiInput" required disabled>
                         <option value="">-- กรุณาเลือกหมวดงานก่อน --</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="subject">ชื่อเอกสาร / เรื่องที่ดำเนินการ:</label>
-                    <input type="text" id="subject" onchange="handleSubjectChange()" required placeholder="ระบุชื่อเรื่อง">
-                </div>
+            </div>
+
+            <!-- 3. รายละเอียดเอกสาร (คอลัมน์ J - O) -->
+            <div class="card">
+                <h3>3. รายละเอียดเอกสารที่ขอแก้ไข</h3>
                 <div class="form-row">
                     <div class="form-group col">
-                        <label for="currentVisit">จำนวนครั้งที่ดำเนินการเดิม:</label>
-                        <input type="number" id="currentVisit" value="0" readonly>
+                        <label for="docType">ประเภท (J):</label>
+                        <select id="docType" required>
+                            <option value="">-- เลือกประเภท --</option>
+                            <option value="P">P</option>
+                            <option value="M">M</option>
+                            <option value="WI">WI</option>
+                            <option value="F">F</option>
+                            <option value="อื่นๆ">อื่นๆ</option>
+                        </select>
+                    </div>
+                    <div class="form-group col">
+                        <label for="docCode">รหัสเอกสาร (K):</label>
+                        <input type="text" id="docCode" placeholder="กรณีขึ้นทะเบียนใหม่ใส่ 'ขอรหัสใหม่'" required>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="jobDetailInput">รายละเอียดการดำเนินงาน:</label>
-                    <textarea id="jobDetailInput" rows="4" placeholder="กรอกรายละเอียด..."></textarea>
+                    <label for="docName">ชื่อเอกสาร (L):</label>
+                    <input type="text" id="docName" placeholder="ระบุชื่อเต็มของเอกสารที่ต้องการดำเนินการ" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="oldRev">ครั้งที่แก้ไข (เดิม) (M):</label>
+                        <input type="text" id="oldRev" placeholder="เช่น 0, 01, 02" value="0" required>
+                    </div>
+                    <div class="form-group col">
+                        <label for="newRev">แก้ไขเอกสารครั้งที่ (ใหม่) (N):</label>
+                        <input type="text" id="newRev" placeholder="เช่น 00, 01, 02" value="0" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="changeDetail">รายละเอียดที่แก้ไข / เหตุผลการร้องขอ (O):</label>
+                    <textarea id="changeDetail" rows="4" placeholder="อธิบายสั้นๆ ให้ชัดเจนว่าต้องการแก้ไขจุดใดบ้าง..." required></textarea>
                 </div>
                 <div class="form-group">
                     <label for="attachFile">แนบไฟล์ประกอบ (ถ้ามี):</label>
@@ -82,14 +115,12 @@
                 </div>
             </div>
 
-            <!-- ปุ่มบันทึก -->
             <div class="form-actions">
-                <button type="submit" id="btnSubmit">บันทึกข้อมูล</button>
+                <button type="submit" id="btnSubmit">บันทึกข้อมูล DCR</button>
             </div>
         </form>
     </div>
 
-    <!-- สคริปต์เชื่อมต่อ -->
     <script src="config.js"></script>
     <script src="script.js"></script>
 </body>
