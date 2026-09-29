@@ -1,6 +1,3 @@
-// ตั้งค่า Web App URL ของ Google Apps Script
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqS2gV4fptVdGz-o8X7iYOnC4IeS9aE7X/exec"; 
-
 let categoriesData = {};
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -20,7 +17,7 @@ function preloadCategories() {
 
     const script = document.createElement("script");
     script.id = scriptId;
-    script.src = `${GOOGLE_SCRIPT_URL}?action=getCategories&callback=renderCategories&t=${new Date().getTime()}`;
+    script.src = `${CONFIG.GOOGLE_SCRIPT_URL}?action=getCategories&callback=renderCategories&t=${new Date().getTime()}`;
     document.body.appendChild(script);
 }
 
@@ -79,7 +76,7 @@ function handleCheckEmail() {
 
     const script = document.createElement("script");
     script.id = scriptId;
-    script.src = `${GOOGLE_SCRIPT_URL}?action=checkEmail&email=${encodeURIComponent(email)}&callback=renderUserData&t=${new Date().getTime()}`;
+    script.src = `${CONFIG.GOOGLE_SCRIPT_URL}?action=checkEmail&email=${encodeURIComponent(email)}&callback=renderUserData&t=${new Date().getTime()}`;
     document.body.appendChild(script);
 }
 
@@ -128,7 +125,7 @@ document.getElementById("dcrForm").addEventListener("submit", async function (e)
     };
 
     try {
-        const res = await fetch(GOOGLE_SCRIPT_URL, {
+        const res = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
             method: "POST",
             body: JSON.stringify(payload)
         });
