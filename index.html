@@ -40,7 +40,7 @@
                 </div>
             </div>
 
-            <!-- ส่วนที่ 2 และ 3 (ซ่อนไว้ก่อนเปิดใช้งานเมื่อค้นพบชื่อ) -->
+            <!-- ส่วนที่ 2 และ 3 (ซ่อนไว้ก่อน เปิดใช้งานเมื่อค้นพบชื่อ) -->
             <div id="restOfForm" style="display: none;">
                 
                 <!-- ส่วนที่ 2: การดำเนินการและหมวดหมู่ออกเอกสาร -->
@@ -62,7 +62,7 @@
                     <div class="form-group">
                         <label for="categoryInput">ลำดับหมวด/ชื่อหมวดงาน:</label>
                         <select id="categoryInput" onchange="handleCategoryChange()" required>
-                            <option value="">-- กำลังโหลดหมวดงาน... --</option>
+                            <option value="">-- เลือกหมวดงาน --</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -114,6 +114,8 @@
         </form>
     </div>
 
+    <!-- เรียกใช้ config.js ก่อน script.js เพื่อป้องกันข้อผิดพลาด -->
+    <script src="config.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
