@@ -4,7 +4,7 @@ const CONFIG = {
     version: "1.0.0",
     database: "Google Sheets",
     
-    GOOGLE_SCRIPT_URL: "https://script.google.com/macros/s/YOUR_DEPLOYED_SCRIPT_ID/exec",
+    GOOGLE_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyGcbg5S7biCKR0M3TDEFa6SFGP-oG6ZBlAK6SYnVG_6hoiopwFQ4ECbQAtvEQd9h0yBQ/exec",
     
     theme: {
         primaryColor: "#002D62",
