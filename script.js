@@ -6,10 +6,14 @@ document.addEventListener("DOMContentLoaded", function () {
     loadCategories();
 });
 
-// โหลดหมวดหมู่งาน (JSONP)
 function loadCategories() {
+    const scriptId = "jsonp-cat-script";
+    let oldScript = document.getElementById(scriptId);
+    if (oldScript) oldScript.remove();
+
     const script = document.createElement("script");
-    script.src = `${CONFIG.GOOGLE_SCRIPT_URL}?action=getCategories&callback=renderCategories`;
+    script.id = scriptId;
+    script.src = `${CONFIG.GOOGLE_SCRIPT_URL}?action=getCategories&callback=renderCategories&t=${new Date().getTime()}`;
     document.body.appendChild(script);
 }
 
@@ -30,7 +34,6 @@ function renderCategories(response) {
     }
 }
 
-// เลือกหมวดงานเพื่อโหลดชื่อระเบียบปฏิบัติ
 function handleCategoryChange() {
     const selectedCat = document.getElementById("categoryInput").value;
     const pwiSelect = document.getElementById("pwiInput");
@@ -49,7 +52,7 @@ function handleCategoryChange() {
     }
 }
 
-// ตรวจสอบข้อมูลผู้ใช้จากอีเมล (JSONP)
+// ตรวจสอบอีเมลอย่างรวดเร็ว
 function handleCheckEmail() {
     const email = document.getElementById("email").value.trim();
     if (!email) {
@@ -61,8 +64,13 @@ function handleCheckEmail() {
     btn.disabled = true;
     btn.textContent = "ตรวจสอบ...";
 
+    const scriptId = "jsonp-email-script";
+    let oldScript = document.getElementById(scriptId);
+    if (oldScript) oldScript.remove();
+
     const script = document.createElement("script");
-    script.src = `${CONFIG.GOOGLE_SCRIPT_URL}?action=checkEmail&email=${encodeURIComponent(email)}&callback=renderUserData`;
+    script.id = scriptId;
+    script.src = `${CONFIG.GOOGLE_SCRIPT_URL}?action=checkEmail&email=${encodeURIComponent(email)}&callback=renderUserData&t=${new Date().getTime()}`;
     document.body.appendChild(script);
 }
 
@@ -74,33 +82,18 @@ function renderUserData(response) {
     if (response.isValid && response.data) {
         document.getElementById("reporterName").value = response.data.name || "";
         document.getElementById("position").value = response.data.position || "";
-        document.getElementById("deptCode").value = response.data.deptCode || response.data.department || "";
-        alert("พบข้อมูลผู้ใช้เรียบร้อยแล้ว");
+        document.getElementById("deptCode").value = response.data.deptCode || "";
     } else {
         alert(response.message || "ไม่พบข้อมูลอีเมลนี้ในระบบ");
     }
 }
 
-// ส่งแบบฟอร์ม (POST Request)
 document.getElementById("dcrForm").addEventListener("submit", async function (e) {
     e.preventDefault();
 
     const btnSubmit = document.getElementById("btnSubmit");
     btnSubmit.disabled = true;
-    btnSubmit.textContent = "กำลังบันทึก...";
-
-    const fileInput = document.getElementById("attachFile");
-    let attachFileData = null;
-
-    if (fileInput.files.length > 0) {
-        const file = fileInput.files[0];
-        const base64 = await convertBase64(file);
-        attachFileData = {
-            name: file.name,
-            type: file.type,
-            base64: base64.split(",")[1]
-        };
-    }
+    btnSubmit.textContent = "กำลังบันทึกและสร้างไฟล์...";
 
     const payload = {
         action: "submitDCR",
@@ -117,8 +110,7 @@ document.getElementById("dcrForm").addEventListener("submit", async function (e)
         docName: document.getElementById("docName").value.trim(),
         oldRev: document.getElementById("oldRev").value.trim(),
         newRev: document.getElementById("newRev").value.trim(),
-        changeDetail: document.getElementById("changeDetail").value.trim(),
-        attachFile: attachFileData
+        changeDetail: document.getElementById("changeDetail").value.trim()
     };
 
     try {
@@ -129,7 +121,7 @@ document.getElementById("dcrForm").addEventListener("submit", async function (e)
         const result = await res.json();
 
         if (result.success) {
-            alert(`บันทึกเรียบร้อยแล้ว! รหัสลำดับ: ${result.dcrId}`);
+            alert(`บันทึกสำเร็จ! เลขที่: ${result.dcrId}`);
             document.getElementById("dcrForm").reset();
             document.getElementById("pwiInput").disabled = true;
         } else {
@@ -143,12 +135,3 @@ document.getElementById("dcrForm").addEventListener("submit", async function (e)
         btnSubmit.textContent = "บันทึกข้อมูล DCR";
     }
 });
-
-function convertBase64(file) {
-    return new Promise((resolve, reject) => {
-        const fileReader = new FileReader();
-        fileReader.readAsDataURL(file);
-        fileReader.onload = () => resolve(fileReader.result);
-        fileReader.onerror = (error) => reject(error);
-    });
-}
