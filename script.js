@@ -1,24 +1,33 @@
+// ตั้งค่า Web App URL ของ Google Apps Script
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqS2gV4fptVdGz-o8X7iYOnC4IeS9aE7X/exec"; 
+
 let categoriesData = {};
 
 document.addEventListener("DOMContentLoaded", function () {
     const today = new Date().toISOString().split("T")[0];
-    document.getElementById("entryDate").value = today;
-    loadCategories();
+    const entryDateElem = document.getElementById("entryDate");
+    if (entryDateElem) entryDateElem.value = today;
+
+    // แอบโหลดหมวดงานไว้เบื้องหลังทันทีที่เปิดหน้าเว็บ
+    preloadCategories();
 });
 
-function loadCategories() {
+// แอบดึงข้อมูลหมวดงานเบื้องหลัง
+function preloadCategories() {
     const scriptId = "jsonp-cat-script";
     let oldScript = document.getElementById(scriptId);
     if (oldScript) oldScript.remove();
 
     const script = document.createElement("script");
     script.id = scriptId;
-    script.src = `${CONFIG.GOOGLE_SCRIPT_URL}?action=getCategories&callback=renderCategories&t=${new Date().getTime()}`;
+    script.src = `${GOOGLE_SCRIPT_URL}?action=getCategories&callback=renderCategories&t=${new Date().getTime()}`;
     document.body.appendChild(script);
 }
 
 function renderCategories(response) {
     const catSelect = document.getElementById("categoryInput");
+    if (!catSelect) return;
+
     catSelect.innerHTML = '<option value="">-- เลือกหมวดงาน --</option>';
 
     if (response.status === "success" && response.data) {
@@ -52,7 +61,7 @@ function handleCategoryChange() {
     }
 }
 
-// ตรวจสอบอีเมลอย่างรวดเร็ว
+// ตรวจสอบอีเมลแบบความเร็วสูง
 function handleCheckEmail() {
     const email = document.getElementById("email").value.trim();
     if (!email) {
@@ -62,7 +71,7 @@ function handleCheckEmail() {
 
     const btn = document.getElementById("btnCheckEmail");
     btn.disabled = true;
-    btn.textContent = "ตรวจสอบ...";
+    btn.textContent = "กำลังค้นหา...";
 
     const scriptId = "jsonp-email-script";
     let oldScript = document.getElementById(scriptId);
@@ -70,7 +79,7 @@ function handleCheckEmail() {
 
     const script = document.createElement("script");
     script.id = scriptId;
-    script.src = `${CONFIG.GOOGLE_SCRIPT_URL}?action=checkEmail&email=${encodeURIComponent(email)}&callback=renderUserData&t=${new Date().getTime()}`;
+    script.src = `${GOOGLE_SCRIPT_URL}?action=checkEmail&email=${encodeURIComponent(email)}&callback=renderUserData&t=${new Date().getTime()}`;
     document.body.appendChild(script);
 }
 
@@ -83,11 +92,16 @@ function renderUserData(response) {
         document.getElementById("reporterName").value = response.data.name || "";
         document.getElementById("position").value = response.data.position || "";
         document.getElementById("deptCode").value = response.data.deptCode || "";
+
+        // แสดงส่วนที่ 2 และ 3 ทันทีเมื่อค้นพบชื่อ
+        document.getElementById("restOfForm").style.display = "block";
     } else {
         alert(response.message || "ไม่พบข้อมูลอีเมลนี้ในระบบ");
+        document.getElementById("restOfForm").style.display = "none";
     }
 }
 
+// บันทึกฟอร์ม DCR
 document.getElementById("dcrForm").addEventListener("submit", async function (e) {
     e.preventDefault();
 
@@ -114,7 +128,7 @@ document.getElementById("dcrForm").addEventListener("submit", async function (e)
     };
 
     try {
-        const res = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+        const res = await fetch(GOOGLE_SCRIPT_URL, {
             method: "POST",
             body: JSON.stringify(payload)
         });
@@ -124,6 +138,7 @@ document.getElementById("dcrForm").addEventListener("submit", async function (e)
             alert(`บันทึกสำเร็จ! เลขที่: ${result.dcrId}`);
             document.getElementById("dcrForm").reset();
             document.getElementById("pwiInput").disabled = true;
+            document.getElementById("restOfForm").style.display = "none";
         } else {
             alert("เกิดข้อผิดพลาด: " + result.message);
         }
